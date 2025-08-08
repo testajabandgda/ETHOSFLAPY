@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EthOS Flappy Bird Retro</title>
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="https://pbs.twimg.com/profile_images/1927690030455341057/pAFgpio-_400x400.jpg" />
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  body, html {
+    margin:0; padding:0; height:100%;
+    background: linear-gradient(135deg, #0b3d91, #093a86);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Press Start 2P', cursive;
+    color: #f0f0f0;
+    user-select:none;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #gameContainer {
+    position: relative;
+    width: 360px;
+    height: 600px;
+    background: #070b16;
+    border: 4px solid #00ffff;
+    overflow: hidden;
+    box-shadow: 0 0 20px #00ffff;
+    image-rendering: pixelated;
+  }
+  canvas {
+    display: block;
+    background: transparent;
+    image-rendering: pixelated;
+  }
+  #score {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #f0f0f0;
+    text-shadow: 1px 1px 2px #000000;
+    user-select:none;
+    z-index: 5;
+  }
+  #menu, #endScreen, #popup {
+    position: absolute;
+    top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    text-align: center;
+    color: #f0f0f0;
+    text-shadow: 1px 1px 3px #000000;
+  }
+  #popup {
+    display: none;
+    border: 4px solid #00ffff;
+    padding: 20px 30px 40px 30px;
+    box-shadow: 0 0 30px #00ffff;
+    animation: popupShow 0.4s ease forwards;
+    user-select: text;
+    font-size: 0.75rem;
+    line-height: 1.3;
+    max-width: 320px;
+    margin: auto;
+    border-radius: 10px;
+    color: #f0f0f0;
+    text-shadow: 1px 1px 2px #000000;
+  }
+  @keyframes popupShow {
+    from {opacity: 0; transform: scale(0.7);}
+    to {opacity: 1; transform: scale(1);}
+  }
+  button {
+    background: #00ffff;
+    border: none;
+    padding: 10px 30px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: #070b16;
+    margin-top: 25px;
+    letter-spacing: 1.5px;
+    transition: background 0.3s ease;
+    font-family: 'Press Start 2P', cursive;
+    border-radius: 0;
+  }
+  button:hover {
+    background: #00cccc;
+  }
+  #popupCode {
+    margin: 15px 0 25px 0;
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: 6px;
+    background: #000;
+    padding: 14px 28px;
+    border: 3px solid #00ffff;
+    color: #00ffff;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: 0 0 8px #00ffff;
+  }
+  #popupClaimText, #popupLogo, #popupExtraInfo > a, #popupClaimAtLink {
+    color: #00ffff;
+    font-family: 'Press Start 2P', cursive;
+    letter-spacing: 1.2px;
+    text-decoration: none;
+    cursor: pointer;
+    text-shadow: 0 0 8px #00ffff;
+    margin: 5px 10px;
+    padding: 6px 12px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    transition: border-color 0.25s ease;
+    user-select: text;
+  }
+  #popupClaimText:hover, #popupLogo:hover, #popupExtraInfo > a:hover, #popupClaimAtLink:hover {
+    border-color: #00ffff;
+  }
+  #popupClaimText {
+    font-size: 0.8rem;
+    user-select: text;
+  }
+  #popupLogo {
+    font-size: 1.2rem;
+    font-weight: 900;
+    user-select: text;
+  }
+  #popupExtraInfo {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+  }
+  #popupClaimAtLink {
+    display: block;
+    margin-top: 18px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    user-select: text;
+  }
+
+  /* Logo top-left container */
+  #topLeftLogoContainer {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 60px;
+    text-align: center;
+    user-select: none;
+    pointer-events: none;
+    z-index: 20;
+    font-family: 'Press Start 2P', cursive;
+    color: #f0f0f0;
+    text-shadow: 1px 1px 2px #000000;
+  }
+
+  #topLeftLogo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #00ffff;
+    box-shadow: 0 0 12px #00ffff;
+    image-rendering: pixelated;
+    display: block;
+    margin: 0 auto;
+  }
+
+  #topLeftLogoText {
+    font-size: 0.65rem;
+    margin-top: 2px;
+    letter-spacing: 1px;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="gameContainer" role="main" aria-label="EthOS Flappy Bird Retro Game">
+  <canvas id="gameCanvas" width="360" height="600" aria-label="Game Canvas"></canvas>
+
+  <!-- Ethereum OS Logo top-left with label -->
+  <div id="topLeftLogoContainer">
+    <img id="topLeftLogo" src="https://pbs.twimg.com/profile_images/1927690030455341057/pAFgpio-_400x400.jpg" alt="Ethereum OS Logo" />
+    <div id="topLeftLogoText">EthOS</div>
+  </div>
+
+  <div id="score" aria-live="polite" aria-atomic="true">Score: 0</div>
+
+  <div id="menu" role="dialog" aria-modal="true" aria-labelledby="menuTitle">
+    <h1 id="menuTitle">EthOS Flappy Bird</h1>
+    <button id="startBtn" aria-label="Start Game">START GAME</button>
+  </div>
+
+  <div id="endScreen" role="dialog" aria-modal="true" aria-labelledby="endTitle" style="display:none;">
+    <h2 id="endTitle">GAME OVER</h2>
+    <p id="finalScore">Your Score: 0</p>
+    <button id="restartBtn" aria-label="Play Again">PLAY AGAIN</button>
+  </div>
+
+  <div id="popup" role="alert" aria-live="assertive" aria-atomic="true" tabindex="0">
+    <a id="popupClaimText" href="https://twitter.com/0xclaimius" target="_blank" rel="noopener noreferrer" aria-label="Go to @0xclaimius Twitter">my x @0xclaimius</a>
+    <div id="popupLogo" aria-hidden="true" role="img" aria-label="EthOS logo text">
+      <a href="https://x.com/Ethereum_OS" target="_blank" rel="noopener noreferrer">EthOS</a>
+    </div>
+    <div><strong>CONGRATULATIONS! 🎉</strong></div>
+    <div>You scored 7 or more and hit a pipe.</div>
+    <div>Here is your special AIR CODE:</div>
+    <div id="popupCode" tabindex="0"></div>
+    <div id="popupExtraInfo">
+      <a href="https://twitter.com/0xclaimius" target="_blank" rel="noopener noreferrer">@0xclaimius</a>
+      <a href="https://x.com/Ethereum_OS" target="_blank" rel="noopener noreferrer">@Ethereum_OS</a>
+    </div>
+    <a id="popupClaimAtLink" href="https://ethos.vision" target="_blank" rel="noopener noreferrer">
+      CLAIM AT: ETHOS VISION
+    </a>
+    <button id="closePopupBtn" aria-label="Close Popup">CLOSE</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const menu = document.getElementById('menu');
+  const endScreen = document.getElementById('endScreen');
+  const finalScoreText = document.getElementById('finalScore');
+  const scoreDisplay = document.getElementById('score');
+  const popup = document.getElementById('popup');
+  const popupCode = document.getElementById('popupCode');
+  const closePopupBtn = document.getElementById('closePopupBtn');
+
+  const rewardCodes = ["A9C05FF3", "7EF405A6", "D1B29CC7", "3F7E91AB", "6D2B8F4E", "C9A77E10", "B812CD3F", "F4E2D189"];
+
+  const width = canvas.width;
+  const height = canvas.height;
+
+  const birdImage = new Image();
+  birdImage.src = "https://pbs.twimg.com/profile_images/1927690030455341057/pAFgpio-_400x400.jpg";
+
+  let bird = {
+    x: 80,
+    y: height/2,
+    width: 40,
+    height: 40,
+    gravity: 0.5,
+    lift: -8,
+    velocity: 0
+  };
+
+  let pipes = [];
+  const pipeWidth = 40;
+  let pipeGap = 190;
+  let pipeSpeed = 3;
+
+  let frameCount = 0;
+  let score = 0;
+  let gameRunning = false;
+  let popupShown = false;
+
+  // Moving clouds data
+  const cloudSize = 8;
+  // Initialize clouds with x,y and speed (pixels per frame)
+  const clouds = [
+    { x: 40, y: 80, speed: 0.3 },
+    { x: 90, y: 60, speed: 0.25 },
+    { x: 140, y: 100, speed: 0.2 },
+    { x: 200, y: 75, speed: 0.28 },
+    { x: 260, y: 90, speed: 0.22 },
+    { x: 300, y: 65, speed: 0.3 },
+  ];
+
+  function drawCloudBlock(x, y, size) {
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(x, y, size, size);
+    ctx.strokeStyle = "#bbbbbb";
+    ctx.strokeRect(x, y, size, size);
+  }
+
+  function drawPixelCloud(x, y) {
+    const s = cloudSize; // block size
+    drawCloudBlock(x + s, y, s);
+    drawCloudBlock(x, y + s, s);
+    drawCloudBlock(x + s, y + s, s);
+    drawCloudBlock(x + 2 * s, y + s, s);
+    drawCloudBlock(x + s, y + 2 * s, s);
+  }
+
+  function drawSky() {
+    // Fill sky base color - light blue pixel style
+    ctx.fillStyle = "#66ccff";
+    ctx.fillRect(0, 0, width, height);
+
+    // Draw and update moving clouds
+    clouds.forEach(cloud => {
+      drawPixelCloud(cloud.x, cloud.y);
+      cloud.x -= cloud.speed;
+      // Reset cloud to right side if off screen left
+      if (cloud.x < -3 * cloudSize) { // 3 blocks width approx
+        cloud.x = width + Math.random() * 50; // random start right side offset
+        cloud.y = 50 + Math.random() * 60;   // slight vertical variation
+      }
+    });
+  }
+
+  function resetGame() {
+    bird.y = height/2;
+    bird.velocity = 0;
+    pipes = [];
+    frameCount = 0;
+    score = 0;
+    pipeGap = 190;
+    pipeSpeed = 3;
+    scoreDisplay.textContent = "Score: 0";
+    popupShown = false;
+    endScreen.style.display = 'none';
+    menu.style.display = 'none';
+    popup.style.display = 'none';
+  }
+
+  function drawBird() {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(bird.x + bird.width/2, bird.y + bird.height/2, bird.width/2, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.drawImage(birdImage, bird.x, bird.y, bird.width, bird.height);
+    ctx.restore();
+  }
+
+  function drawPipe(x, y, w, h) {
+    const pipeColor = "#00cccc";
+    const pipeShadow = "#004d4d";
+    for(let i = 0; i < w; i += 5) {
+      for(let j = 0; j < h; j += 5) {
+        ctx.fillStyle = ((i + j) % 10 === 0) ? pipeColor : pipeShadow;
+        ctx.fillRect(x + i, y + j, 5, 5);
+      }
+    }
+    const topHeight = 20;
+    for(let i = 0; i < w; i += 5) {
+      for(let j = 0; j < topHeight; j += 5) {
+        ctx.fillStyle = pipeShadow;
+        ctx.fillRect(x + i, y + j, 5, 5);
+      }
+    }
+  }
+
+  function checkCollision(pipe) {
+    let cx = bird.x + bird.width / 2;
+    let cy = bird.y + bird.height / 2;
+    let rx = pipe.x;
+    let ry = pipe.y;
+    let rw = pipe.width;
+    let rh = pipe.height;
+
+    let closestX = Math.max(rx, Math.min(cx, rx + rw));
+    let closestY = Math.max(ry, Math.min(cy, ry + rh));
+
+    let distX = cx - closestX;
+    let distY = cy - closestY;
+
+    return (distX * distX + distY * distY) < (Math.min(bird.width, bird.height) / 2) ** 2;
+  }
+
+  function update() {
+    drawSky();
+
+    bird.velocity += bird.gravity;
+    bird.y += bird.velocity;
+
+    drawBird();
+
+    if(frameCount % 90 === 0) {
+      if(score >= 7) {
+        pipeGap = 130;
+        pipeSpeed = 5;
+      } else {
+        pipeGap = 190;
+        pipeSpeed = 3;
+      }
+
+      let topHeight = Math.floor(Math.random() * (height - pipeGap - 100)) + 50;
+      pipes.push({x: width, y: 0, width: pipeWidth, height: topHeight});
+      pipes.push({x: width, y: topHeight + pipeGap, width: pipeWidth, height: height});
+    }
+
+    for(let i = pipes.length - 1; i >= 0; i--) {
+      let p = pipes[i];
+      p.x -= pipeSpeed;
+      drawPipe(p.x, p.y, p.width, p.height);
+
+      if(checkCollision(p)) {
+        endGameWithPopup();
+        return;
+      }
+
+      if(p.x + p.width < 0) {
+        pipes.splice(i, 1);
+        if(i % 2 === 0) {
+          score++;
+          scoreDisplay.textContent = "Score: " + score;
+        }
+      }
+    }
+
+    if(bird.y + bird.height > height || bird.y < 0) {
+      endGameWithPopup();
+      return;
+    }
+
+    frameCount++;
+    if(gameRunning && !popupShown) {
+      requestAnimationFrame(update);
+    }
+  }
+
+  function endGameWithPopup() {
+    gameRunning = false;
+    endScreen.style.display = 'flex';
+    finalScoreText.textContent = "Your Score: " + score;
+
+    if(score >= 7) {
+      showPopup();
+    } else {
+      popup.style.display = 'none';
+    }
+  }
+
+  function showPopup() {
+    popupShown = true;
+    const code = rewardCodes[Math.floor(Math.random()*rewardCodes.length)];
+    popupCode.textContent = code;
+    popup.style.display = 'flex';
+    popup.focus();
+  }
+
+  closePopupBtn.addEventListener('click', () => {
+    popup.style.display = 'none';
+    popupShown = false;
+  });
+
+  startBtn.addEventListener('click', () => {
+    resetGame();
+    gameRunning = true;
+    menu.style.display = 'none';
+    endScreen.style.display = 'none';
+    update();
+  });
+
+  restartBtn.addEventListener('click', () => {
+    resetGame();
+    gameRunning = true;
+    menu.style.display = 'none';
+    endScreen.style.display = 'none';
+    update();
+  });
+
+  window.addEventListener('keydown', e => {
+    if(e.code === 'Space' || e.code === 'ArrowUp') {
+      e.preventDefault();
+      if(gameRunning && !popupShown) flap();
+    }
+  });
+
+  window.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if(gameRunning && !popupShown) flap();
+  }, {passive:false});
+
+  function flap() {
+    bird.velocity = bird.lift;
+  }
+})();
+</script>
+
+</body>
+</html>
