@@ -27,7 +27,7 @@
     position: relative;
     width: 360px;
     height: 600px;
-    background: linear-gradient(to top, #80c1ff 0%, #c9e7ff 100%);
+    background: #070b16;
     border: 4px solid #00ffff;
     overflow: hidden;
     box-shadow: 0 0 20px #00ffff;
@@ -35,7 +35,7 @@
   }
   canvas {
     display: block;
-    background: transparent;
+    background: #70a6ff; /* Retro sky blue */
     image-rendering: pixelated;
   }
   #score {
@@ -45,7 +45,7 @@
     transform: translateX(-50%);
     font-size: 1.4rem;
     font-weight: 700;
-    color: #003366;
+    color: #002366; /* darker blue for better contrast */
     text-shadow: 0 0 6px #ffffff;
     user-select:none;
     z-index: 5;
@@ -162,7 +162,6 @@
     image-rendering: pixelated;
     z-index: 20;
   }
-
   /* Text under top-left logo */
   #logoText {
     position: absolute;
@@ -170,10 +169,10 @@
     left: 8px;
     width: 60px;
     text-align: center;
-    font-size: 0.6rem;
-    color: #003366;
-    text-shadow: 0 0 6px #ffffff;
     font-family: 'Press Start 2P', cursive;
+    font-size: 0.6rem;
+    color: #00ffff;
+    text-shadow: 0 0 5px #00ffff;
     user-select: none;
     pointer-events: none;
     z-index: 20;
@@ -192,13 +191,13 @@
   <div id="score" aria-live="polite" aria-atomic="true">Score: 0</div>
 
   <div id="menu" role="dialog" aria-modal="true" aria-labelledby="menuTitle">
-    <h1 id="menuTitle" style="color:#003366; text-shadow: 0 0 6px #ffffff;">EthOS Flappy Bird</h1>
+    <h1 id="menuTitle" style="color:#00ffff;">EthOS Flappy Bird</h1>
     <button id="startBtn" aria-label="Start Game">START GAME</button>
   </div>
 
   <div id="endScreen" role="dialog" aria-modal="true" aria-labelledby="endTitle" style="display:none;">
-    <h2 id="endTitle" style="color:#003366; text-shadow: 0 0 6px #ffffff;">GAME OVER</h2>
-    <p id="finalScore" style="color:#003366; text-shadow: 0 0 6px #ffffff;">Your Score: 0</p>
+    <h2 id="endTitle" style="color:#00ffff;">GAME OVER</h2>
+    <p id="finalScore" style="color:#00ffff;">Your Score: 0</p>
     <button id="restartBtn" aria-label="Play Again">PLAY AGAIN</button>
   </div>
 
@@ -241,13 +240,6 @@
   const width = canvas.width;
   const height = canvas.height;
 
-  // Cloud variables
-  const clouds = [
-    {x: 10, y: 100, speed: 0.3, size: 40},
-    {x: 150, y: 80, speed: 0.5, size: 30},
-    {x: 280, y: 120, speed: 0.2, size: 35}
-  ];
-
   const birdImage = new Image();
   birdImage.src = "https://pbs.twimg.com/profile_images/1927690030455341057/pAFgpio-_400x400.jpg";
 
@@ -284,15 +276,6 @@
     endScreen.style.display = 'none';
     menu.style.display = 'none';
     popup.style.display = 'none';
-  }
-
-  function drawCloud(x, y, size) {
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.ellipse(x, y, size * 0.6, size * 0.4, 0, 0, Math.PI * 2);
-    ctx.ellipse(x + size * 0.5, y + 5, size * 0.7, size * 0.5, 0, 0, Math.PI * 2);
-    ctx.ellipse(x + size, y, size * 0.6, size * 0.4, 0, 0, Math.PI * 2);
-    ctx.fill();
   }
 
   function drawBird() {
@@ -342,14 +325,14 @@
   function update() {
     ctx.clearRect(0, 0, width, height);
 
-    // Draw moving clouds
-    clouds.forEach(c => {
-      drawCloud(c.x, c.y, c.size);
-      c.x += c.speed;
-      if(c.x - c.size > width) {
-        c.x = -c.size * 2;
-      }
-    });
+    // Draw retro sky gradient background with clouds
+    let gradient = ctx.createLinearGradient(0, 0, 0, height);
+    gradient.addColorStop(0, '#70a6ff');
+    gradient.addColorStop(1, '#1d4fa7');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+
+    drawClouds();
 
     bird.velocity += bird.gravity;
     bird.y += bird.velocity;
@@ -400,6 +383,28 @@
     }
   }
 
+  // Cloud properties
+  const cloudImage = new Image();
+  cloudImage.src = "https://i.imgur.com/rRKdbdK.png"; // simple pixel cloud png or create your own
+  let clouds = [];
+  for(let i=0; i<5; i++) {
+    clouds.push({
+      x: Math.random() * width,
+      y: Math.random() * (height/2),
+      speed: 0.3 + Math.random() * 0.3
+    });
+  }
+
+  function drawClouds() {
+    clouds.forEach(c => {
+      ctx.globalAlpha = 0.6;
+      ctx.drawImage(cloudImage, c.x, c.y, 80, 50);
+      ctx.globalAlpha = 1.0;
+      c.x -= c.speed;
+      if(c.x < -80) c.x = width;
+    });
+  }
+
   function endGameWithPopup() {
     gameRunning = false;
     endScreen.style.display = 'flex';
@@ -425,33 +430,27 @@
     popupShown = false;
   });
 
-  function startGame() {
+  closePopupBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    popup.style.display = 'none';
+    popupShown = false;
+  }, {passive:false});
+
+  startBtn.addEventListener('click', () => {
     resetGame();
     gameRunning = true;
     menu.style.display = 'none';
     endScreen.style.display = 'none';
     update();
-  }
+  });
 
-  startBtn.addEventListener('click', startGame);
-  startBtn.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    startGame();
-  }, {passive: false});
-
-  function restartGame() {
+  restartBtn.addEventListener('click', () => {
     resetGame();
     gameRunning = true;
     menu.style.display = 'none';
     endScreen.style.display = 'none';
     update();
-  }
-
-  restartBtn.addEventListener('click', restartGame);
-  restartBtn.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    restartGame();
-  }, {passive: false});
+  });
 
   window.addEventListener('keydown', e => {
     if(e.code === 'Space' || e.code === 'ArrowUp') {
