@@ -18,17 +18,16 @@
     justify-content: center;
     align-items: center;
     font-family: 'Press Start 2P', cursive;
-    color: #f0f0f0;
+    color: #00ffff;
     user-select:none;
     -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: grayscale;
   }
-
   #gameContainer {
     position: relative;
     width: 360px;
     height: 600px;
-    background: #070b16;
+    background: linear-gradient(to top, #80c1ff 0%, #c9e7ff 100%);
     border: 4px solid #00ffff;
     overflow: hidden;
     box-shadow: 0 0 20px #00ffff;
@@ -46,8 +45,8 @@
     transform: translateX(-50%);
     font-size: 1.4rem;
     font-weight: 700;
-    color: #f0f0f0;
-    text-shadow: 1px 1px 2px #000000;
+    color: #003366;
+    text-shadow: 0 0 6px #ffffff;
     user-select:none;
     z-index: 5;
   }
@@ -61,8 +60,6 @@
     align-items: center;
     z-index: 10;
     text-align: center;
-    color: #f0f0f0;
-    text-shadow: 1px 1px 3px #000000;
   }
   #popup {
     display: none;
@@ -76,8 +73,6 @@
     max-width: 320px;
     margin: auto;
     border-radius: 10px;
-    color: #f0f0f0;
-    text-shadow: 1px 1px 2px #000000;
   }
   @keyframes popupShow {
     from {opacity: 0; transform: scale(0.7);}
@@ -152,37 +147,52 @@
     user-select: text;
   }
 
-  /* Logo top-left container */
-  #topLeftLogoContainer {
+  /* Logo top-left with updated size */
+  #topLeftLogo {
     position: absolute;
     top: 8px;
     left: 8px;
-    width: 60px;
-    text-align: center;
-    user-select: none;
-    pointer-events: none;
-    z-index: 20;
-    font-family: 'Press Start 2P', cursive;
-    color: #f0f0f0;
-    text-shadow: 1px 1px 2px #000000;
-  }
-
-  #topLeftLogo {
     width: 60px;
     height: 60px;
     border-radius: 50%;
     border: 2px solid #00ffff;
     box-shadow: 0 0 12px #00ffff;
+    user-select: none;
+    pointer-events: none;
     image-rendering: pixelated;
-    display: block;
-    margin: 0 auto;
+    z-index: 20;
   }
 
-  #topLeftLogoText {
-    font-size: 0.65rem;
-    margin-top: 2px;
-    letter-spacing: 1px;
+  /* Text under top-left logo */
+  #logoText {
+    position: absolute;
+    top: 74px;
+    left: 8px;
+    width: 60px;
+    text-align: center;
+    font-size: 0.6rem;
+    color: #003366;
+    text-shadow: 0 0 6px #ffffff;
+    font-family: 'Press Start 2P', cursive;
     user-select: none;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  /* Logo top-right */
+  #topRightLogo {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    border: 2px solid #00ffff;
+    box-shadow: 0 0 12px #00ffff;
+    user-select: none;
+    pointer-events: none;
+    image-rendering: pixelated;
+    z-index: 20;
   }
 </style>
 </head>
@@ -191,39 +201,40 @@
 <div id="gameContainer" role="main" aria-label="EthOS Flappy Bird Retro Game">
   <canvas id="gameCanvas" width="360" height="600" aria-label="Game Canvas"></canvas>
 
-  <!-- Ethereum OS Logo top-left with label -->
-  <div id="topLeftLogoContainer">
-    <img id="topLeftLogo" src="https://pbs.twimg.com/profile_images/1927690030455341057/pAFgpio-_400x400.jpg" alt="Ethereum OS Logo" />
-    <div id="topLeftLogoText">EthOS</div>
-  </div>
+  <!-- Ethereum OS Logo top-left -->
+  <img id="topLeftLogo" src="https://pbs.twimg.com/profile_images/1927690030455341057/pAFgpio-_400x400.jpg" alt="Ethereum OS Logo" />
+  <div id="logoText">EthOS</div>
+
+  <!-- Top-right logo -->
+  <img id="topRightLogo" src="https://pbs.twimg.com/profile_banners/1900189639371055104/1748432096/1500x500.jpg" alt="Top Right Logo" />
 
   <div id="score" aria-live="polite" aria-atomic="true">Score: 0</div>
 
   <div id="menu" role="dialog" aria-modal="true" aria-labelledby="menuTitle">
-    <h1 id="menuTitle">EthOS Flappy Bird</h1>
+    <h1 id="menuTitle" style="color:#003366; text-shadow: 0 0 6px #ffffff;">EthOS Flappy Bird</h1>
     <button id="startBtn" aria-label="Start Game">START GAME</button>
   </div>
 
   <div id="endScreen" role="dialog" aria-modal="true" aria-labelledby="endTitle" style="display:none;">
-    <h2 id="endTitle">GAME OVER</h2>
-    <p id="finalScore">Your Score: 0</p>
+    <h2 id="endTitle" style="color:#003366; text-shadow: 0 0 6px #ffffff;">GAME OVER</h2>
+    <p id="finalScore" style="color:#003366; text-shadow: 0 0 6px #ffffff;">Your Score: 0</p>
     <button id="restartBtn" aria-label="Play Again">PLAY AGAIN</button>
   </div>
 
   <div id="popup" role="alert" aria-live="assertive" aria-atomic="true" tabindex="0">
     <a id="popupClaimText" href="https://twitter.com/0xclaimius" target="_blank" rel="noopener noreferrer" aria-label="Go to @0xclaimius Twitter">my x @0xclaimius</a>
     <div id="popupLogo" aria-hidden="true" role="img" aria-label="EthOS logo text">
-      <a href="https://x.com/Ethereum_OS" target="_blank" rel="noopener noreferrer">EthOS</a>
+      <a href="https://x.com/Ethereum_OS" target="_blank" rel="noopener noreferrer" style="color:#00ffff; text-decoration:none;">EthOS</a>
     </div>
     <div><strong>CONGRATULATIONS! 🎉</strong></div>
     <div>You scored 7 or more and hit a pipe.</div>
     <div>Here is your special AIR CODE:</div>
     <div id="popupCode" tabindex="0"></div>
     <div id="popupExtraInfo">
-      <a href="https://twitter.com/0xclaimius" target="_blank" rel="noopener noreferrer">@0xclaimius</a>
-      <a href="https://x.com/Ethereum_OS" target="_blank" rel="noopener noreferrer">@Ethereum_OS</a>
+      <a href="https://twitter.com/0xclaimius" target="_blank" rel="noopener noreferrer" aria-label="Go to @0xclaimius Twitter">@0xclaimius</a>
+      <a href="https://x.com/Ethereum_OS" target="_blank" rel="noopener noreferrer" aria-label="Go to Ethereum OS on X">@Ethereum_OS</a>
     </div>
-    <a id="popupClaimAtLink" href="https://ethos.vision" target="_blank" rel="noopener noreferrer">
+    <a id="popupClaimAtLink" href="https://ethos.vision" target="_blank" rel="noopener noreferrer" aria-label="Go to ETHOS VISION website">
       CLAIM AT: ETHOS VISION
     </a>
     <button id="closePopupBtn" aria-label="Close Popup">CLOSE</button>
@@ -249,6 +260,13 @@
   const width = canvas.width;
   const height = canvas.height;
 
+  // Cloud variables
+  const clouds = [
+    {x: 10, y: 100, speed: 0.3, size: 40},
+    {x: 150, y: 80, speed: 0.5, size: 30},
+    {x: 280, y: 120, speed: 0.2, size: 35}
+  ];
+
   const birdImage = new Image();
   birdImage.src = "https://pbs.twimg.com/profile_images/1927690030455341057/pAFgpio-_400x400.jpg";
 
@@ -272,51 +290,6 @@
   let gameRunning = false;
   let popupShown = false;
 
-  // Moving clouds data
-  const cloudSize = 8;
-  // Initialize clouds with x,y and speed (pixels per frame)
-  const clouds = [
-    { x: 40, y: 80, speed: 0.3 },
-    { x: 90, y: 60, speed: 0.25 },
-    { x: 140, y: 100, speed: 0.2 },
-    { x: 200, y: 75, speed: 0.28 },
-    { x: 260, y: 90, speed: 0.22 },
-    { x: 300, y: 65, speed: 0.3 },
-  ];
-
-  function drawCloudBlock(x, y, size) {
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(x, y, size, size);
-    ctx.strokeStyle = "#bbbbbb";
-    ctx.strokeRect(x, y, size, size);
-  }
-
-  function drawPixelCloud(x, y) {
-    const s = cloudSize; // block size
-    drawCloudBlock(x + s, y, s);
-    drawCloudBlock(x, y + s, s);
-    drawCloudBlock(x + s, y + s, s);
-    drawCloudBlock(x + 2 * s, y + s, s);
-    drawCloudBlock(x + s, y + 2 * s, s);
-  }
-
-  function drawSky() {
-    // Fill sky base color - light blue pixel style
-    ctx.fillStyle = "#66ccff";
-    ctx.fillRect(0, 0, width, height);
-
-    // Draw and update moving clouds
-    clouds.forEach(cloud => {
-      drawPixelCloud(cloud.x, cloud.y);
-      cloud.x -= cloud.speed;
-      // Reset cloud to right side if off screen left
-      if (cloud.x < -3 * cloudSize) { // 3 blocks width approx
-        cloud.x = width + Math.random() * 50; // random start right side offset
-        cloud.y = 50 + Math.random() * 60;   // slight vertical variation
-      }
-    });
-  }
-
   function resetGame() {
     bird.y = height/2;
     bird.velocity = 0;
@@ -330,6 +303,15 @@
     endScreen.style.display = 'none';
     menu.style.display = 'none';
     popup.style.display = 'none';
+  }
+
+  function drawCloud(x, y, size) {
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.ellipse(x, y, size * 0.6, size * 0.4, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + size * 0.5, y + 5, size * 0.7, size * 0.5, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + size, y, size * 0.6, size * 0.4, 0, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   function drawBird() {
@@ -377,7 +359,18 @@
   }
 
   function update() {
-    drawSky();
+    ctx.clearRect(0, 0, width, height);
+
+    // Draw retro sky background (gradient is already in container, canvas is transparent)
+
+    // Draw moving clouds
+    clouds.forEach(c => {
+      drawCloud(c.x, c.y, c.size);
+      c.x += c.speed;
+      if(c.x - c.size > width) {
+        c.x = -c.size * 2;
+      }
+    });
 
     bird.velocity += bird.gravity;
     bird.y += bird.velocity;
@@ -453,21 +446,33 @@
     popupShown = false;
   });
 
-  startBtn.addEventListener('click', () => {
+  function startGame() {
     resetGame();
     gameRunning = true;
     menu.style.display = 'none';
     endScreen.style.display = 'none';
     update();
-  });
+  }
 
-  restartBtn.addEventListener('click', () => {
+  startBtn.addEventListener('click', startGame);
+  startBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    startGame();
+  }, {passive: false});
+
+  function restartGame() {
     resetGame();
     gameRunning = true;
     menu.style.display = 'none';
     endScreen.style.display = 'none';
     update();
-  });
+  }
+
+  restartBtn.addEventListener('click', restartGame);
+  restartBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    restartGame();
+  }, {passive: false});
 
   window.addEventListener('keydown', e => {
     if(e.code === 'Space' || e.code === 'ArrowUp') {
