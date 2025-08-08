@@ -178,22 +178,6 @@
     pointer-events: none;
     z-index: 20;
   }
-
-  /* Logo top-right */
-  #topRightLogo {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 60px;
-    height: 60px;
-    border-radius: 8px;
-    border: 2px solid #00ffff;
-    box-shadow: 0 0 12px #00ffff;
-    user-select: none;
-    pointer-events: none;
-    image-rendering: pixelated;
-    z-index: 20;
-  }
 </style>
 </head>
 <body>
@@ -204,9 +188,6 @@
   <!-- Ethereum OS Logo top-left -->
   <img id="topLeftLogo" src="https://pbs.twimg.com/profile_images/1927690030455341057/pAFgpio-_400x400.jpg" alt="Ethereum OS Logo" />
   <div id="logoText">EthOS</div>
-
-  <!-- Top-right logo -->
-  <img id="topRightLogo" src="https://pbs.twimg.com/profile_banners/1900189639371055104/1748432096/1500x500.jpg" alt="Top Right Logo" />
 
   <div id="score" aria-live="polite" aria-atomic="true">Score: 0</div>
 
@@ -360,8 +341,6 @@
 
   function update() {
     ctx.clearRect(0, 0, width, height);
-
-    // Draw retro sky background (gradient is already in container, canvas is transparent)
 
     // Draw moving clouds
     clouds.forEach(c => {
